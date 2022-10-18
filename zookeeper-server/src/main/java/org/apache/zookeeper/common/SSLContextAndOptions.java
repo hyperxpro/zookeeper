@@ -21,6 +21,8 @@ package org.apache.zookeeper.common;
 import static java.util.Objects.requireNonNull;
 import io.netty.handler.ssl.IdentityCipherSuiteFilter;
 import io.netty.handler.ssl.JdkSslContext;
+import io.netty.handler.ssl.OpenSsl;
+import io.netty.handler.ssl.OpenSslServerContext;
 import io.netty.handler.ssl.SslContext;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,10 +30,16 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,6 +107,18 @@ public class SSLContextAndOptions {
     public SSLServerSocket createSSLServerSocket(int port) throws IOException {
         SSLServerSocket sslServerSocket = (SSLServerSocket) sslContext.getServerSocketFactory().createServerSocket(port);
         return configureSSLServerSocket(sslServerSocket);
+    }
+
+    public SslContext createNettyServerBestSslContext(KeyManager keyManager, TrustManager trustManager) throws SSLException {
+        return SslContextBuilder.forServer(keyManager)
+                .trustManager(trustManager)
+                .sslProvider(OpenSsl.isAvailable() ? SslProvider.OPENSSL : SslProvider.JDK)
+                .protocols(enabledProtocols)
+                .ciphers(cipherSuitesAsList, IdentityCipherSuiteFilter.INSTANCE)
+                .applicationProtocolConfig(null)
+                .clientAuth(clientAuth.toNettyClientAuth())
+                .startTls(false)
+                .build();
     }
 
     public SslContext createNettyJdkSslContext(SSLContext sslContext, boolean isClientSocket) {

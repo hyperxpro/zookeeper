@@ -60,6 +60,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509KeyManager;
@@ -573,7 +574,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
         this.bootstrap.validate();
     }
 
-    private synchronized void initSSL(ChannelPipeline p, boolean supportPlaintext) throws X509Exception, KeyManagementException, NoSuchAlgorithmException {
+    private synchronized void initSSL(ChannelPipeline p, boolean supportPlaintext) throws X509Exception, KeyManagementException, NoSuchAlgorithmException, SSLException {
         String authProviderProp = System.getProperty(x509Util.getSslAuthProviderProperty());
         SslContext nettySslContext;
         if (authProviderProp == null) {
@@ -590,7 +591,8 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
             }
 
             sslContext.init(new X509KeyManager[]{authProvider.getKeyManager()}, new X509TrustManager[]{authProvider.getTrustManager()}, null);
-            nettySslContext = x509Util.getDefaultSSLContextAndOptions().createNettyJdkSslContext(sslContext, false);
+//            nettySslContext = x509Util.getDefaultSSLContextAndOptions().createNettyJdkSslContext(sslContext, false);
+            nettySslContext = x509Util.getDefaultSSLContextAndOptions().createNettyServerBestSslContext(authProvider.getKeyManager(), authProvider.getTrustManager());
         }
 
         if (supportPlaintext) {
