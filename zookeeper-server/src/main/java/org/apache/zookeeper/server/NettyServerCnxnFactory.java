@@ -574,7 +574,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
         this.bootstrap.validate();
     }
 
-    private synchronized void initSSL(ChannelPipeline p, boolean supportPlaintext) throws X509Exception, KeyManagementException, NoSuchAlgorithmException, SSLException {
+    private synchronized void initSSL(ChannelPipeline p, boolean supportPlaintext) throws X509Exception, SSLException {
         String authProviderProp = System.getProperty(x509Util.getSslAuthProviderProperty());
         SslContext nettySslContext;
         if (authProviderProp == null) {
@@ -589,7 +589,8 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
                 throw new SSLContextException("Could not create SSLContext with specified auth provider: " + authProviderProp);
             }
 
-            nettySslContext = x509Util.getDefaultSSLContextAndOptions().createNettyTcNativeSslContextServer(authProvider.getKeyManager(), authProvider.getTrustManager());
+            nettySslContext = x509Util.getDefaultSSLContextAndOptions()
+                    .createNettyTcNativeSslContextServer(authProvider.getKeyManager(), authProvider.getTrustManager());
         }
 
         if (supportPlaintext) {
