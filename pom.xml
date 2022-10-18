@@ -559,6 +559,7 @@
     <hamcrest.version>2.2</hamcrest.version>
     <commons-cli.version>1.4</commons-cli.version>
     <netty.version>4.1.76.Final</netty.version>
+    <netty.tcnative.version>2.0.51.Final</netty.tcnative.version>
     <jetty.version>9.4.43.v20210629</jetty.version>
     <jackson.version>2.13.2.1</jackson.version>
     <jline.version>2.14.6</jline.version>
@@ -710,6 +711,12 @@
         <groupId>io.netty</groupId>
         <artifactId>netty-transport-native-epoll</artifactId>
         <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-tcnative-boringssl-static</artifactId>
+        <version>${netty.tcnative.version}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
