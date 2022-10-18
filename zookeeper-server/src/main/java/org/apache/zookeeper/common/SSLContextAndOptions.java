@@ -107,7 +107,7 @@ public class SSLContextAndOptions {
         return configureSSLServerSocket(sslServerSocket);
     }
 
-    public SslContext createNettyServerBestSslContext(KeyManager keyManager, TrustManager trustManager) throws SSLException {
+    public SslContext createNettyTcNativeSslContextServer(KeyManager keyManager, TrustManager trustManager) throws SSLException {
         return SslContextBuilder.forServer(keyManager)
                 .trustManager(trustManager)
                 .sslProvider(OpenSsl.isAvailable() ? SslProvider.OPENSSL : SslProvider.JDK)
